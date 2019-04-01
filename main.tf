@@ -4,10 +4,11 @@ data "template_file" "fluentd_values" {
   template = "${file("${path.module}/templates/fluentd_values.yaml.tpl")}"
 
   vars = {
-    elasticsearch_endpoint              = "https://${aws_elasticsearch_domain.logging.endpoint}"
-    fluentd_aws_elasticsearch_image_url = "${var.fluentd_aws_elasticsearch_image_url}"
-    region                              = "${var.region}"
-    logstash_prefix                     = "logstash"
+    elasticsearch_endpoint = "https://${aws_elasticsearch_domain.logging.endpoint}"
+    image_url              = "${var.fluentd_aws_elasticsearch_image_url}"
+    image_tag              = "${var.fluentd_aws_elasticsearch_image_tag}"
+    region                 = "${var.region}"
+    logstash_prefix        = "logstash"
   }
 }
 
@@ -29,9 +30,17 @@ resource "aws_elasticsearch_domain" "logging" {
     volume_size = "${var.elasticsearch_volume_size}"
   }
 
-  vpc_options {
-    subnet_ids = ["${var.subnet_ids[0]}"]
+  cluster_config {
+    instance_count           = "${var.elasticsearch_instance_count}"
+    instance_type            = "${var.elasticsearch_instance_type}"
+    dedicated_master_enabled = "${var.elasticsearch_dedicated_master_instance_count > 0 ? 1 : 0}"
+    dedicated_master_count   = "${var.elasticsearch_dedicated_master_instance_count}"
+    zone_awareness_enabled   = "${local.enable_zone_awareness}"
+  }
 
+  vpc_options {
+    # subnet_ids = ["${slice(var.subnet_ids, 0, min((var.elasticsearch_dedicated_master_instance_count > 0 ? var.elasticsearch_dedicated_master_instance_count : 1), length(var.subnet_ids)))}"]
+    subnet_ids         = ["${slice(var.subnet_ids, 0, (local.enable_zone_awareness == 0 ? 1 : length(var.subnet_ids) - (length(var.subnet_ids) % 2) ))}"]
     security_group_ids = ["${aws_security_group.elasticsearch.id}"]
   }
 
@@ -47,11 +56,11 @@ resource "aws_security_group" "elasticsearch" {
   vpc_id = "${var.vpc_id}"
 
   ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
 
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/8"]
   }
 }
 

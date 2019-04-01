@@ -29,6 +29,11 @@ variable "fluentd_aws_elasticsearch_image_url" {
   description = "Location of the Fluentd Elasticsearch docker image to use"
 }
 
+variable "fluentd_aws_elasticsearch_image_tag" {
+  description = "Image tag for Fluentd Elasticsearch docker image."
+  default     = "latest"
+}
+
 variable "elasticsearch_domain_name" {
   description = "Name of the Elasticsearch cluster"
 }
@@ -39,8 +44,23 @@ variable "elasticsearch_version" {
 }
 
 variable "elasticsearch_volume_size" {
-  description = "The size of the EBS volumes attached in GB"
-  default     = 20
+  description = "The size of the EBS volumes attached in GB (size per instance)"
+  default     = 10
+}
+
+variable "elasticsearch_instance_type" {
+  description = "Instance type of the elasticsearch cluster"
+  default     = "m4.large.elasticsearch"
+}
+
+variable "elasticsearch_instance_count" {
+  description = "Number of instances in the elasticsearch cluster"
+  default     = 1
+}
+
+variable "elasticsearch_dedicated_master_instance_count" {
+  description = "Number of dedicated master instances in the elasticsearch cluster"
+  default     = 1
 }
 
 variable "tags" {

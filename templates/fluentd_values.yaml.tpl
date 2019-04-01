@@ -3,8 +3,8 @@ rbac:
 elasticsearch:
   logstash_prefix: ${logstash_prefix}
 image:
-  repository: ${fluentd_aws_elasticsearch_image_url}
-  tag: latest
+  repository: ${image_url}
+  tag: ${image_tag}
   pullPolicy: Always
 configMaps:
   output.conf: |-
