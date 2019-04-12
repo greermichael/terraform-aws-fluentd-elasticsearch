@@ -48,7 +48,7 @@ resource "aws_elasticsearch_domain" "logging" {
 
   tags = "${merge(local.common_tags, var.tags)}"
 
-  depends_on = ["aws_iam_service_linked_role.elasticsearch"]
+  # depends_on = ["aws_iam_service_linked_role.elasticsearch"]
 }
 
 resource "aws_security_group" "elasticsearch" {
@@ -64,9 +64,9 @@ resource "aws_security_group" "elasticsearch" {
   }
 }
 
-resource "aws_iam_service_linked_role" "elasticsearch" {
-  aws_service_name = "es.amazonaws.com"
-}
+# resource "aws_iam_service_linked_role" "elasticsearch" {
+#   aws_service_name = "es.amazonaws.com"
+# }
 
 data "aws_iam_policy_document" "elasticsearch" {
   statement {
