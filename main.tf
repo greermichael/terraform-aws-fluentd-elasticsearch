@@ -66,6 +66,7 @@ resource "aws_security_group" "elasticsearch" {
 
 resource "aws_iam_service_linked_role" "elasticsearch" {
   aws_service_name = "es.amazonaws.com"
+  custom_suffix    = "${var.elasticsearch_domain_name}"
 }
 
 data "aws_iam_policy_document" "elasticsearch" {
